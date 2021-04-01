@@ -1,0 +1,15 @@
+
+
+cmake_minimum_required(VERSION 2.8.2)
+project(PyBind-download NONE)
+
+include(ExternalProject)
+ExternalProject_Add(pybind
+    GIT_REPOSITORY https://github.com/pybind/pybind11/
+    GIT_TAG v2.6.2
+    SOURCE_DIR "${PYBIND11_DIR}"
+    CONFIGURE_COMMAND ""
+    BUILD_COMMAND ""
+    INSTALL_COMMAND ""
+    TEST_COMMAND ""
+)
