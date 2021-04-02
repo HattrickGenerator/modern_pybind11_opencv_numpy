@@ -5,18 +5,6 @@
 
 namespace py = pybind11;
 
-
-static std::vector<int> convert(const std::vector<long>& p_vec)
-{
-    std::vector<int> out;
-    out.reserve(p_vec.size());
-    for (long val : p_vec)
-    {
-        out.push_back(val);
-    }
-    return out;
-}
-
 template<typename T> class CMat : public cv::Mat_<T>
 {
 public:
@@ -33,7 +21,7 @@ public:
     //This implementation will use the constructor of cv::Mat_(int, int*, T*) for general Nd-arrays
     CMat(py::array_t<T> xs)
         : cv::Mat_<T>(int(xs.request(true).shape.size()),
-                      convert(xs.request(true).shape).data(),
+                      [](const auto & shape){return std::vector<int>(shape.begin(), shape.end());}(xs.request(true).shape).data(),
                       static_cast<T*>(xs.request(true).ptr))
     {
     }
