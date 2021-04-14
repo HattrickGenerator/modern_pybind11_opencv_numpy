@@ -1,8 +1,8 @@
 # modern_pybind11_opencv_numpy
 
-An easy to use and lightweight opencv numpy converter. The goal of this project is, to provide a simple and reliable converter between cv::Mat_<T> class and numpy arrays.
+An easy to use and lightweight opencv numpy converter. The goal of this project is to provide a simple and reliable converter between cv::Mat_<T> class and numpy arrays.
 
-The design philosophy is, is that a simple build process must be maintained. Under Linux a:
+The design philosophy is that a simple build process must be maintained. Under Linux a:
 
 	mkdir build && cd build
 	cmake .. && cmake --build .
