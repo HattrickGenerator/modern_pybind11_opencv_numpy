@@ -3,8 +3,9 @@
 An easy to use and lightweight opencv numpy converter. The goal of this project is, to provide a simple and reliable converter between cv::Mat_<T> class and numpy arrays.
 
 The design philosophy is, is that a simple build process must be maintained. Under Linux a:
-$ mkdir build && cd build
-$ cmake .. && cmake --build .
+
+	mkdir build && cd build
+	cmake .. && cmake --build .
 
 must be sufficient.
 
@@ -16,7 +17,5 @@ Pre-requisites under linux (tested on Ubuntu 20.04 LTS):
 
 	sudo apt install -y libopencv-dev libopencv-highgui-dev libopencv-imgproc-dev python3-opencv
 	sudo apt install -y python-dev
-
-Install Build essentials
-	sudo apt install build-essential 
+	sudo apt install -y build-essential 
 
