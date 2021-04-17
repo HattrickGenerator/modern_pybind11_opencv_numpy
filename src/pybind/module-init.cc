@@ -1,5 +1,6 @@
 #include "matrix-binding.hh"
 #include <pybind11/pybind11.h>
+#include "matrix-converter.hh"
 
 namespace py = pybind11;
 
@@ -16,21 +17,14 @@ namespace py = pybind11;
 
 
 //Example function of a transform
-py::array_t<double> transform(py::array_t<double> p_mat, double p_factor, double p_offset)
+CMat<double> transform(CMat<double> p_mat, double p_factor, double p_offset)
 {
-    py::array_t<double> workingCopy{p_mat.request(true)}; //Perform a deep copy
-    CMat<double> mat(workingCopy);
-    mat = mat*p_factor+p_offset;
-    return workingCopy;
+    return p_mat * p_factor + p_offset;
 }
 
 
 PYBIND11_MODULE(cvmatbindpy, m)
-{
-    py::class_<CMat<double>>(m, "CMat").def(py::init(&CMat<double>::wrapArray));
-
-    //py::array::forcecast is the default argument and ensures that non conforming arguments are converted into an array
-    py::implicitly_convertible<py::array_t<double>, CMat<double>>();
+{    //py::array::forcecast is the default argument and ensures that non conforming arguments are converted into an array
 
     m.def("transform", &transform);
 }

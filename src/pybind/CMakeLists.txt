@@ -6,6 +6,8 @@ list(APPEND DEPENDENCIES ${OpenCV_LIBS})
 
 
 set(HEADER_FILES
+    matrix-converter.hh
+    matrix-converter.inl.hh
 matrix-binding.hh
 )
 
