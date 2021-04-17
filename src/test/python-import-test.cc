@@ -1,19 +1,14 @@
-#include <QProcess>
-#include <gtest/gtest.h>
+#include "python-import-test.hh"
 
-TEST(BasicAlgoTest, importModule)
+TEST_F(PythonTests, importModule)
 {
-    QProcess process;
-    process.setProgram("python3");
-    process.setArguments(QStringList() << "-c"
-                                       << "import sys; sys.path.insert(0, './src/pybind/'); import cvmatbindpy");
-    process.start();
-    process.waitForFinished();
-
-    int status  = process.exitStatus();
-    QString err = process.readAllStandardError();
-
-    EXPECT_EQ(status, 0) << "Process not exited with 0";
-    EXPECT_TRUE(err.isEmpty()) << err.toStdString();
+    m_worker->setArguments(QStringList() << "-c"
+                                         << "import sys; sys.path.insert(0, './src/pybind/'); import cvmatbindpy");
 }
 
+
+/// Test if vector after transform stays the same
+TEST_F(PythonTests, DISABLED_numpy_ndarray_shape_test)
+{
+    m_worker->setArguments(QStringList() << "pytestfiles/numpy_ndarray_shape_test.py");
+}
