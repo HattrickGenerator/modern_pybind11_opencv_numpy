@@ -6,7 +6,7 @@ TEST(BasicAlgoTest, importModule)
     QProcess process;
     process.setProgram("python3");
     process.setArguments(QStringList() << "-c"
-                                       << "import sys; sys.path.insert(0, './lib/'); import cvMatPy");
+                                       << "import sys; sys.path.insert(0, './src/pybind/'); import cvmatbindpy");
     process.start();
     process.waitForFinished();
 

@@ -14,7 +14,7 @@ module-init.cc
 )
 
 
-set(CVMATBIND_PYTHON_MODULE_NAME ${PROJECT_NAME}py)
+set(CVMATBIND_PYTHON_MODULE_NAME cvmatbindpy)
 
 #Use Pybind11 Macro to add module
 pybind11_add_module(${CVMATBIND_PYTHON_MODULE_NAME} ${SOURCE_FILES} ${HEADER_FILES})

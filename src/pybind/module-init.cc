@@ -25,7 +25,7 @@ py::array_t<double> transform(py::array_t<double> p_mat, double p_factor, double
 }
 
 
-PYBIND11_MODULE(cvMatBindpy, m)
+PYBIND11_MODULE(cvmatbindpy, m)
 {
     py::class_<CMat<double>>(m, "CMat").def(py::init(&CMat<double>::wrapArray));
 
