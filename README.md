@@ -19,3 +19,9 @@ Pre-requisites under linux (tested on Ubuntu 20.04 LTS):
 	sudo apt install -y python-dev
 	sudo apt install -y build-essential 
 
+
+
+Current issues to work on:
+Returned numpy arrays have their own data flag set to false. This is because they are based on the data allocated by opencv (so we can guarantee the minimum number of allocations). Is there a sensible way to steal the data from cv::Mat?
+
+Performance tests would be nice
