@@ -11,7 +11,6 @@ if("${PROJECT_SOURCE_DIR}" STREQUAL "${PROJECT_BINARY_DIR}")
 endif()
 
 option(WITH_TESTS "Build google test project (needs Qt Core)" OFF)
-option(WITH_AUTO_PIP "Pip install python library after each build for more comfortable development process" OFF)
 
 
 # ------------------------------------------------------------------------------
