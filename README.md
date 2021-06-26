@@ -16,7 +16,7 @@ The converter will work under a virtual environment as well as with only native 
 Pre-requisites under linux (tested on Ubuntu 20.04 LTS):
 
 	sudo apt install -y libopencv-dev libopencv-highgui-dev libopencv-imgproc-dev python3-opencv
-	sudo apt install -y python-dev
+	sudo apt install -y python3-dev
 	sudo apt install -y build-essential 
 
 
