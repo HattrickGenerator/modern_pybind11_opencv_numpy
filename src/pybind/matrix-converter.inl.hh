@@ -1,6 +1,6 @@
 
 template <typename T>
-py::array_t<T> CMatrixBinding::ToNumpyArray(const CMat<T> &p_mat) {
+py::array_t<T> CMatrixBinding::ToNumpyArray(cv::Mat_<T> &&p_mat) {
   // give memory cleanup responsibility to the Numpy array
 
   // Get vector of dimensions
@@ -18,22 +18,22 @@ py::array_t<T> CMatrixBinding::ToNumpyArray(const CMat<T> &p_mat) {
   // can't do this with the this pointer, as the current matrix might go out of
   // scope, invalidating the this pointer and our possibility to call release on
   // it.
-  CMat<T> *refCountDummy;
+  cv::Mat_<T> *refCountDummy;
 
   // This is a hack: In order to avoid segmentation faults to return data that
   // isn't owned by this matrix We check if the u-pointer in the matrix isn't
   // null. If this is the case we have an owning view! -> We return the complete
   // array. Otherwise we deep copy.
   if (p_mat.u) {
-    refCountDummy = new CMat<T>(p_mat);
+    refCountDummy = new cv::Mat_<T>(p_mat);
   } else {
-    refCountDummy = new CMat<T>(p_mat.clone());
+    refCountDummy = new cv::Mat_<T>(p_mat.clone());
   }
 
   // Hand over our ref counting dummy for deletion in a capsule from the python
   // side
   py::capsule free_when_done(
-      refCountDummy, [](void *f) { delete reinterpret_cast<CMat<T> *>(f); });
+      refCountDummy, [](void *f) { delete reinterpret_cast<cv::Mat_<T> *>(f); });
 
   // Not dealing with strides yet
   if (p_mat.isContinuous()) {
@@ -57,10 +57,10 @@ py::array_t<T> CMatrixBinding::ToNumpyArray(const CMat<T> &p_mat) {
   }
 }
 
-template <typename T> CMat<T> *CMatrixBinding::ToMat(py::array_t<T> p_arr) {
+template <typename T> std::unique_ptr<cv::Mat_<T>>  CMatrixBinding::ToMat(py::array_t<T> p_arr) {
   py::buffer_info info = p_arr.request(true);
 
   std::vector<int> shapeVector{info.shape.begin(), info.shape.end()};
 
-  return new CMat<T>(shapeVector, static_cast<T *>(info.ptr));
+  return std::make_unique<cv::Mat_<T>>( cv::Mat_<T>(shapeVector.size(), shapeVector.data(),  static_cast<T *>(info.ptr)));
 }

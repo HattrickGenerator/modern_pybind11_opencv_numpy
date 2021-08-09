@@ -1,5 +1,5 @@
-#include "matrix-binding.hh"
 #include <pybind11/pybind11.h>
+#include <opencv2/core/core.hpp>
 #include "matrix-converter.hh"
 
 namespace py = pybind11;
@@ -17,9 +17,9 @@ namespace py = pybind11;
 
 
 //Example function of a transform
-CMat<double> transform(CMat<double> p_mat, double p_factor, double p_offset)
+cv::Mat_<double> transform(cv::Mat_<double> p_mat, double p_factor, double p_offset)
 {
-    return p_mat * p_factor + p_offset;
+    return cv::Mat_<double>(p_mat * p_factor + p_offset);
 }
 
 

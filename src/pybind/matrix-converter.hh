@@ -1,26 +1,26 @@
-#include <Python.h>
 #include <pybind11/numpy.h>
 #include <pybind11/pybind11.h>
+#include <memory>
 
 namespace py = pybind11;
 
 namespace CMatrixBinding {
-/// Returns a numpy array that doesn't perform a deep copy of CMat<T>, but
+/// Returns a numpy array that doesn't perform a deep copy of cv::Mat_<T>, but
 /// doesn't own the data
-template <typename T> py::array_t<T> ToNumpyArray(const CMat<T> &p_mat);
+template <typename T> py::array_t<T> ToNumpyArray(cv::Mat_<T> &&p_mat);
 
-template <typename T> CMat<T> *ToMat(py::array_t<T> p_arr);
+template <typename T> std::unique_ptr<cv::Mat_<T>> ToMat(py::array_t<T> p_arr);
 }; // namespace CMatrixBinding
 
 /**
  *  @brief Pybind11 custom type caster between numpy array and our custom matrix
  *
- *  Handles conversions between numpy arrays and CMat without any user
+ *  Handles conversions between numpy arrays and cv::Mat_ without any user
  * interaction. Completely hides the binding from users on python and C++ side
  */
 template <typename T>
-struct py::detail::type_caster<CMat<T>> : public type_caster_base<CMat<T>> {
-  using base = type_caster_base<CMat<T>>;
+struct py::detail::type_caster<cv::Mat_<T>> : public type_caster_base<cv::Mat_<T>> {
+  using base = type_caster_base<cv::Mat_<T>>;
 
 public:
   /// Handle ingoing cast: Python to C++
@@ -31,7 +31,7 @@ public:
                   // never want to expose cv::Mat in C++ code
   {
     if (py::isinstance<py::array_t<T>>(src)) {
-      this->value = CMatrixBinding::ToMat(py::cast<array_t<T>>(src));
+      this->value = CMatrixBinding::ToMat<T>(py::cast<array_t<T>>(src)).release();
       return true;
     } else
       return false;
@@ -41,9 +41,9 @@ public:
   /// Only accepting l-value references to automatically conform to a move
   /// return policy
   static py::handle
-  cast(CMat<T> &&p_mat, py::return_value_policy,
+  cast(cv::Mat_<T> &&p_mat, py::return_value_policy,
        py::handle) { // Create the numpy array from custom matrix
-    py::array_t<T> arr = CMatrixBinding::ToNumpyArray(p_mat);
+    py::array_t<T> arr = CMatrixBinding::ToNumpyArray(std::move(p_mat));
 
     // Because we want to return ownership to python, we need to manually
     // increment it's reference count
