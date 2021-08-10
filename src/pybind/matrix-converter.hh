@@ -1,6 +1,6 @@
+#include <memory>
 #include <pybind11/numpy.h>
 #include <pybind11/pybind11.h>
-#include <memory>
 
 namespace py = pybind11;
 
@@ -19,7 +19,8 @@ template <typename T> std::unique_ptr<cv::Mat_<T>> ToMat(py::array_t<T> p_arr);
  * interaction. Completely hides the binding from users on python and C++ side
  */
 template <typename T>
-struct py::detail::type_caster<cv::Mat_<T>> : public type_caster_base<cv::Mat_<T>> {
+struct py::detail::type_caster<cv::Mat_<T>>
+    : public type_caster_base<cv::Mat_<T>> {
   using base = type_caster_base<cv::Mat_<T>>;
 
 public:
@@ -31,10 +32,16 @@ public:
                   // never want to expose cv::Mat in C++ code
   {
     if (py::isinstance<py::array_t<T>>(src)) {
-      this->value = CMatrixBinding::ToMat<T>(py::cast<array_t<T>>(src)).release();
-      return true;
-    } else
-      return false;
+      std::unique_ptr<cv::Mat_<T>> mat =
+          CMatrixBinding::ToMat<T>(py::cast<array_t<T>>(src));
+
+      if (mat) {
+        this->value = mat.release();
+        return true;
+      }
+    }
+
+    return false;
   }
 
   /// Handle outgoing cast: C++ to Python
