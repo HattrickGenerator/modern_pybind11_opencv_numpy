@@ -48,11 +48,47 @@ py::array_t<T> CMatrixBinding::ToNumpyArray(cv::Mat_<T> &&p_mat) {
 }
 
 template <typename T>
-std::unique_ptr<cv::Mat_<T>> CMatrixBinding::ToMat(py::array_t<T> p_arr) {
+std::unique_ptr<cv::Mat_<T>> ToMat_CStyle(py::array_t<T> p_arr) {
   py::buffer_info info = p_arr.request(true);
+  std::vector<py::ssize_t> shapes = info.shape;
+  std::vector<int> shapeVector(info.shape.begin(), info.shape.end());
 
-  std::vector<int> shapeVector{info.shape.begin(), info.shape.end()};
+  return std::make_unique<cv::Mat_<T>>(shapeVector.size(), shapeVector.data(),
+                                       static_cast<T *>(info.ptr));
+}
 
-  return std::make_unique<cv::Mat_<T>>(cv::Mat_<T>(
-      shapeVector.size(), shapeVector.data(), static_cast<T *>(info.ptr)));
+template <typename T>
+std::unique_ptr<cv::Mat_<T>> CMatrixBinding::ToMat(py::array_t<T> p_arr) {
+  //////////////////////////////////////////////////////////////////////////////////////
+  // C-style array is naturally supported by opencv. We only need to use
+  // shapes and strides
+  if (py::isinstance<py::array_t<T, py::array::c_style>>(p_arr)) {
+    return ToMat_CStyle(p_arr);
+  }
+
+  //////////////////////////////////////////////////////////////////////////////////////
+  // F-style array isn't naturally supported by opencv (I think?). So we
+  // transpose, create the array and transpose again
+  else if (py::isinstance<py::array_t<T, py::array::f_style>>(p_arr)) {
+    py::array_t<T> array_T =
+        py::cast<py::array_t<T>>(p_arr.attr("transpose")());
+
+    std::unique_ptr<cv::Mat_<T>> ptr = ToMat_CStyle(array_T);
+
+    cv::transpose(*ptr, *ptr);
+    return ptr;
+  }
+  //////////////////////////////////////////////////////////////////////////////////////
+  // Numpy arrays with any shapes and strides get copied for simplicity. A
+  // copied matrix will follow c-style arrays
+  else {
+    py::array_t<T> array_copy = py::cast<py::array_t<T>>(p_arr.attr("copy")());
+
+    std::unique_ptr<cv::Mat_<T>> ptr = ToMat_CStyle(array_copy);
+
+    // We need to perform another deep copy because we can't take ownership of
+    // the python array, as it only lives in our current scope
+    *ptr = ptr->clone();
+    return ptr;
+  }
 }
